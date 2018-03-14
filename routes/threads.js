@@ -6,10 +6,10 @@ console.log(customStore.last);
 
 /* GET users listing. */
 router.get('/', function(req, res, next) {
-  res.send('respaond with a resource');
+  res.send(customStore.top20);
 });
 
-router.post('/', function(req, res, next) {
+router.post('/create', function(req, res, next) {
   var threads = customStore.insert(req.body);
   if (threads == false) {
     res.json(error('Message should not be longer than 255 characters!'));
