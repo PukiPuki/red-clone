@@ -13,13 +13,14 @@ class DataStructure {
     if (topic.length>255) {
       return false;
     } else {
-      var thread = {topic, date:Date.now(), vote:0, position:this.last};
+      var thread = {topic, date:Date.now(), votes:0, position:this.last};
       this.last += 1;
-      // this map will be used to upvote or downvote.
+      
+      // this map will be used to upvotes or downvotes.
       this.map.set(thread.topic+thread.date, thread);
       
       // We append more items to the back
-      var index = this.firstLastIndex.get(thread.vote);
+      var index = this.firstLastIndex.get(thread.votes);
       index.last += 1;
 
       // Check if thread position less than 20
