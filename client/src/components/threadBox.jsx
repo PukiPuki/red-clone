@@ -4,8 +4,11 @@ import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
 import Paper from 'material-ui/Paper';
 import FlatButton from 'material-ui/FlatButton';
+import IconButton from 'material-ui/IconButton';
 
 import { Flex, Box } from 'reflexbox';
+
+import { upVote } from '../api/threadApi';
 
 class ThreadBox extends Component {
   constructor(props){
@@ -13,9 +16,13 @@ class ThreadBox extends Component {
   }
 
   upVoteHandler = () => {
+    const {topic, date} = this.props;
+    this.props.upVoteThreadHandler({topic, date});
   }
 
   downVoteHandler = () => {
+    const {topic, date} = this.props;
+    this.props.downVoteThreadHandler({topic, date});
   }
 
   render() {
@@ -26,9 +33,9 @@ class ThreadBox extends Component {
             {this.props.votes}
           </Box>
           <Box px={2} w={2/12}>
-            <FlatButton label="↑" primary={true} />
+            <FlatButton label="↑" primary={true} onClick={this.upVoteHandler}/>
             <br/>
-            <FlatButton label="↓" secondary={true} />
+            <FlatButton label="↓" secondary={true} onClick={this.downVoteHandler}/>
           </Box>
           <Box px={2} w={8/12}>
             {this.props.topic}

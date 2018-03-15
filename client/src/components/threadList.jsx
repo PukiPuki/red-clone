@@ -10,7 +10,7 @@ import {Toolbar, ToolbarGroup, ToolbarSeparator, ToolbarTitle} from 'material-ui
 import { Flex, Box } from 'reflexbox';
 import ThreadBox from './threadBox';
 
-import { fetchThreads, createThread } from '../api/threadApi';
+import { fetchThreads, createThread, upVote, downVote } from '../api/threadApi';
 
 
 class ThreadList extends Component {
@@ -45,7 +45,22 @@ class ThreadList extends Component {
     this.setState({topic:""});
   }
 
+  upVoteThreadHandler = ({topic, date}) => {
+    upVote({topic, date})
+      .then(res => {
+        this.setState({threads: res.body});
+      });
+  }
+
+  downVoteThreadHandler = ({topic, date}) => {
+    downVote({topic, date})
+      .then(res => {
+        this.setState({threads: res.body});
+      });
+  }
+
   render() {
+    //let threads = [{topic:"smell" }];
     let threads = this.state.threads;
 
     let MappedThreads = () => {
@@ -54,7 +69,9 @@ class ThreadList extends Component {
           <ThreadBox
             topic={thread.topic}
             date={thread.date}
-            vote={thread.vote}/>
+            votes={thread.votes}
+            upVoteThreadHandler={this.upVoteThreadHandler}
+            downVoteThreadHandler={this.downVoteThreadHandler}/>
         );
       })
     };
