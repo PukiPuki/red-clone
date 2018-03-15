@@ -42,8 +42,10 @@ class DataStructure {
 
       // Append to the end
       this.rank.push(thread);
-      console.log(this.rank.slice(0,20));
-      this.top20 = this.rank.slice(0,20);
+
+      if(position <20) {
+        this.updateTop20();
+      }
 
       return this.top20;
     }
@@ -52,61 +54,52 @@ class DataStructure {
   update({id, vote}) {
     // retrieve thread object
     var thread = this.map.get(id);
-    var {votes, position} = thread;
-    if (vote) {
-       // increase
-      console.log("beofre");
-      this.incOp(thread);
-      console.log("after");
-
-      return this.top20;
-    } else {
-      return this.top20;
-    }
-  }
-
-  con() {
-    console.log("con");
-  }
-
-  incOp(thread) {
-    // special case if position = 0;
     var oldPos = thread.position;
-    var oldVotes = thread.votes;
+    var nextPos = vote ? this.voteUpFirstLastIndex(thread)
+          : this.voteDownFirstLastIndex(thread);
 
-    console.log("qwer");
+    // swap positions
+    this.updateRank(oldPos, nextPos, vote);
+
+    // for debugging
+    // console.log(this.rank);
+    // console.log(this.firstLastIndex);
+    return this.top20;
+  }
+
+  updateOp(thread, vote) {
+    // special case if position = 0;
     const nextPos = this.voteUpFirstLastIndex(thread);
-    console.log("oass");
-    this.updateRank(oldPos, nextPos);
-    this.updateTop20();
   }
 
   voteUpFirstLastIndex(thread) {
-    var id = thread.topic + thread.date;
-    var oldPos = thread.position;
-    var oldVotes = thread.votes;
+    const id = thread.topic + thread.date;
+    const oldPos = thread.position;
+    const oldVotes = thread.votes;
+    const nextVotes = oldVotes+1;
 
     var oldFirstLast = this.firstLastIndex.get(oldVotes);
-    var nextFirstLast = this.firstLastIndex.get(oldVotes+1);
+    var nextFirstLast = this.firstLastIndex.get(nextVotes);
 
     const nextPos = oldFirstLast.first;
 
-    console.log("here");
     if(nextFirstLast==undefined) {
       // special case, no one in this slot of votes yet
-      const nextFirst = oldFirstLast.first;
-      const nextLast = nextFirst + 1;
+      const nextFirst = nextPos;
+      const nextLast = nextPos + 1;
 
       this.firstLastIndex
-        .set(oldVotes+1,
+        .set(nextVotes,
              {
                first: nextFirst,
                last: nextLast
              })
     } else {
       // if it already exists
+      // just append to the end of it
       nextFirstLast.last += 1;
     }
+
     // remove from previous vote index
     // add 1 because one of the items moved up to higher vote
     oldFirstLast.first += 1;
@@ -118,8 +111,49 @@ class DataStructure {
     return nextPos;
   }
 
-  updateRank(oldPos, nextPos) {
-    console.log("did you");
+  voteDownFirstLastIndex(thread) {
+    const id = thread.topic + thread.date;
+    const oldPos = thread.position;
+    const oldVotes = thread.votes;
+    const nextVotes = oldVotes-1;
+    
+    var oldFirstLast = this.firstLastIndex.get(oldVotes);
+    var nextFirstLast = this.firstLastIndex.get(nextVotes);
+    
+    const nextPos = oldFirstLast.last;
+    
+    if(nextFirstLast==undefined) {
+      // special case, no one in this slot of votes yet
+      // create the slot
+      const nextFirst = nextPos - 1;
+      const nextLast = nextPos;
+      
+      this.firstLastIndex
+        .set(nextVotes,
+             {
+               first: nextFirst,
+               last: nextLast
+             })
+    } else {
+      // if it already exists
+      // just append to the head of it
+      nextFirstLast.first -= 1;
+    }
+    
+    // remove from previous vote index
+    // minus 1 because one of the items moved to lower vote
+    oldFirstLast.last -= 1;
+    if(oldFirstLast.first == oldFirstLast.last) {
+      // if there is nothing in this place remove it from map
+      this.firstLastIndex.delete(oldVotes);
+    }
+    
+    return nextPos-1;
+  }
+
+
+  // to swap position
+  updateRank(oldPos, nextPos, vote) {
     var old = this.rank[oldPos];
     var next = this.rank[nextPos];
 
@@ -132,15 +166,25 @@ class DataStructure {
     this.rank[nextPos] = old;
 
     // update internal vote
-    old.votes += 1;
+    if(vote) {
+      old.votes += 1;
+    } else {
+      old.votes -= 1;
+    }
 
-    // for debugging
-    // console.log(this.rank);
-    // console.log(this.firstLastIndex);
+    // only update top20 if there is a swap
+    if(nextPos < 20 || oldPos < 20) {
+      this.updateTop20();
+    }
+
   }
 
+
+  /* only update when required
+     to reduce useless computation
+     */
   updateTop20() {
-      this.top20 = this.rank.slice(0,20);
+    this.top20 = this.rank.slice(0,20);
   }
 
 }
