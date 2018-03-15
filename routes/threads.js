@@ -18,8 +18,10 @@ router.post('/create', function(req, res, next) {
   }
 })
 
-router.post('/:id/vote', function(req, res, next) {
-  var threads = customStore.update(req.body);
+router.put('/:id/vote', function(req, res, next) {
+  const id = req.params.id;
+  const vote = req.body.vote;
+  var threads = customStore.update({id, vote});
   if (threads == undefined) {
     res.status(error('vote not found'));
   } else {
