@@ -21,7 +21,6 @@ export const fetchThreads = () => {
 };
 
 export const createThread = (topic) => {
-  console.log("this is called");
   const url = '/api/threads/create';
   const method = 'POST';
   const data = { topic };
@@ -29,11 +28,18 @@ export const createThread = (topic) => {
 };
 
 export const upVote = ({topic, date}) => {
-  console.log("this is called");
   const id = topic+date;
-  const url = '/api/threads/${id}/vote';
+  const url = `/api/threads/${id}/vote`;
   const method = 'PUT';
   const data = { vote: true };
+  return requestHelper({url, method, data});
+};
+
+export const downVote = ({topic, date}) => {
+  const id = topic+date;
+  const url = `/api/threads/${id}/vote`;
+  const method = 'PUT';
+  const data = { vote: false };
   return requestHelper({url, method, data});
 };
 
