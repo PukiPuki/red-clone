@@ -12,7 +12,16 @@ router.get('/', function(req, res, next) {
 router.post('/create', function(req, res, next) {
   var threads = customStore.insert(req.body);
   if (threads == false) {
-    res.json(error('Message should not be longer than 255 characters!'));
+    res.status(error('Message should not be longer than 255 characters!'));
+  } else {
+    res.json(threads);
+  }
+})
+
+router.post('/:id/vote', function(req, res, next) {
+  var threads = customStore.update(req.body);
+  if (threads == undefined) {
+    res.status(error('vote not found'));
   } else {
     res.json(threads);
   }
