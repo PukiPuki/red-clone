@@ -1,6 +1,6 @@
-
 class DataStructure {
   constructor() {
+    // counter for last element
     this.last = 0;
 
     // this will be used to map id to thread object
@@ -10,6 +10,7 @@ class DataStructure {
     // this will be used to achieve O(1) updates
     // this is done by jumping the array
     this.firstLastIndex = new Map();
+
     // set the first one, its always zero
     this.firstLastIndex.set(0, {first: 0, last: 0});
 
@@ -20,21 +21,20 @@ class DataStructure {
     this.top20 = [];
   }
 
-  insertFirstLast() {
-  }
-
   insert({topic}) {
     if (topic.length>255) {
       return false;
     } else {
       const position = this.last;
-      var thread = {topic, date:Date.now(), votes:0, position:this.last};
+      const thread = {topic, date: Date.now(),
+                      votes:0, position: this.last};
+      // increment last element position
       this.last += 1;
       
       this.map.set(thread.topic+thread.date, thread);
       
       // We append more items to the back
-      var firstLast = this.firstLastIndex.get(0);
+      let firstLast = this.firstLastIndex.get(0);
       if(firstLast == undefined) {
         firstLast = this.firstLastIndex.set(0, {first: position, last: position});
       }
@@ -53,9 +53,15 @@ class DataStructure {
 
   update({id, vote}) {
     // retrieve thread object
-    var thread = this.map.get(id);
-    var oldPos = thread.position;
-    var nextPos = vote ? this.voteUpFirstLastIndex(thread)
+    const thread = this.map.get(id);
+
+    // prevent negative voting
+    if (thread.votes == 0 && !vote) {
+      return this.top20;
+    }
+
+    const oldPos = thread.position;
+    const nextPos = vote ? this.voteUpFirstLastIndex(thread)
           : this.voteDownFirstLastIndex(thread);
 
     // swap positions
@@ -117,8 +123,8 @@ class DataStructure {
     const oldVotes = thread.votes;
     const nextVotes = oldVotes-1;
     
-    var oldFirstLast = this.firstLastIndex.get(oldVotes);
-    var nextFirstLast = this.firstLastIndex.get(nextVotes);
+    const oldFirstLast = this.firstLastIndex.get(oldVotes);
+    const nextFirstLast = this.firstLastIndex.get(nextVotes);
     
     const nextPos = oldFirstLast.last;
     
@@ -151,11 +157,10 @@ class DataStructure {
     return nextPos-1;
   }
 
-
   // to swap position
   updateRank(oldPos, nextPos, vote) {
-    var old = this.rank[oldPos];
-    var next = this.rank[nextPos];
+    const old = this.rank[oldPos];
+    const next = this.rank[nextPos];
 
     // update internal position
     old.position = nextPos;
@@ -178,7 +183,6 @@ class DataStructure {
     }
 
   }
-
 
   /* only update when required
      to reduce useless computation
