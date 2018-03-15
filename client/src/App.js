@@ -14,11 +14,8 @@ class App extends Component {
             <Flex p={2} align='center'>
               <Box px={2} w={1/12}>
               </Box>
-              <Box px={2} w={7/12}>
+              <Box px={2} w={10/12}>
                 <ThreadList/>
-              </Box>
-              <Box px={2} w={3/12}>
-                <Login/>
               </Box>
               <Box px={2} w={1/12}>
               </Box>
